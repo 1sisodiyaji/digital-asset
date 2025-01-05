@@ -4,14 +4,13 @@ import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import FileUpload from "./FileUpload";
 import { IKUploadResponse } from "imagekitio-next/dist/types/components/IKUpload/props";
-import { Loader2, Plus, Trash2 } from "lucide-react";
-import { useNotification } from "./Notification";
+import { Loader2, Plus, Trash2 } from "lucide-react"; 
 import { IMAGE_VARIANTS, ImageVariantType } from "@/models/Product";
 import { apiClient, ProductFormData } from "@/lib/api-client";
+import toast from "react-hot-toast";
 
 export default function AdminProductForm() {
-  const [loading, setLoading] = useState(false);
-  const { showNotification } = useNotification();
+  const [loading, setLoading] = useState(false); 
 
   const {
     register,
@@ -41,14 +40,14 @@ export default function AdminProductForm() {
 
   const handleUploadSuccess = (response: IKUploadResponse) => {
     setValue("imageUrl", response.filePath);
-    showNotification("Image uploaded successfully!", "success");
+    toast.success("Image uploaded successfully!");
   };
 
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
     try {
       await apiClient.createProduct(data);
-      showNotification("Product created successfully!", "success");
+      toast.success("Product created successfully!");
 
       // Reset form after successful submission
       setValue("name", "");
@@ -62,10 +61,8 @@ export default function AdminProductForm() {
         },
       ]);
     } catch (error) {
-      showNotification(
-        error instanceof Error ? error.message : "Failed to create product",
-        "error"
-      );
+      toast.error("Failed to create product");
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -73,11 +70,11 @@ export default function AdminProductForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="form-control">
+      <div className="form-control ">
         <label className="label">Product Name</label>
         <input
           type="text"
-          className={`input input-bordered ${errors.name ? "input-error" : ""}`}
+          className={`p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 ${errors.name ? "input-error" : ""}`}
           {...register("name", { required: "Name is required" })}
         />
         {errors.name && (
@@ -88,7 +85,7 @@ export default function AdminProductForm() {
       <div className="form-control">
         <label className="label">Description</label>
         <textarea
-          className={`textarea textarea-bordered h-24 ${
+          className={`textarea h-24 p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 ${
             errors.description ? "textarea-error" : ""
           }`}
           {...register("description", { required: "Description is required" })}
@@ -108,12 +105,12 @@ export default function AdminProductForm() {
       <div className="divider">Image Variants</div>
 
       {fields.map((field, index) => (
-        <div key={field.id} className="card bg-base-200 p-4">
+        <div key={field.id} className="card  rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="form-control">
               <label className="label">Size & Aspect Ratio</label>
               <select
-                className="select select-bordered"
+                className="select  select-bordered  p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-700"
                 {...register(`variants.${index}.type`)}
               >
                 {Object.entries(IMAGE_VARIANTS).map(([key, value]) => (
@@ -128,7 +125,7 @@ export default function AdminProductForm() {
             <div className="form-control">
               <label className="label">License</label>
               <select
-                className="select select-bordered"
+                className="select select-bordered p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800"
                 {...register(`variants.${index}.license`)}
               >
                 <option value="personal">Personal Use</option>
@@ -142,7 +139,7 @@ export default function AdminProductForm() {
                 type="number"
                 step="0.01"
                 min="0.01"
-                className="input input-bordered"
+                className="border border-gray-700 appearance-none p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800"
                 {...register(`variants.${index}.price`, {
                   valueAsNumber: true,
                   required: "Price is required",
@@ -187,7 +184,7 @@ export default function AdminProductForm() {
 
       <button
         type="submit"
-        className="btn btn-primary btn-block"
+        className="btn bg-red-500 hover:bg-red-600 text-white border-0 btn-block"
         disabled={loading}
       >
         {loading ? (

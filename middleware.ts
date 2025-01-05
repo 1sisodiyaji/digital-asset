@@ -28,6 +28,8 @@ export default withAuth(
         if (
           pathname === "/" ||
           pathname.startsWith("/api/products") ||
+          pathname.startsWith("/about") ||
+          pathname.startsWith("/contact") ||
           pathname.startsWith("/products")
         ) {
           return true;

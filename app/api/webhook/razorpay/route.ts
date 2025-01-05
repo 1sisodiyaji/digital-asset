@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     await connectToDatabase();
 
     if (event.event === "payment.captured") {
+      console.log("event trigeered" , event);
       const payment = event.payload.payment.entity;
 
       const order = await Order.findOneAndUpdate(

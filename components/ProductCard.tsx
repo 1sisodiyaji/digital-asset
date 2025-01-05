@@ -10,7 +10,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
   );
 
   return (
-    <div className="card bg-base-100 shadow hover:shadow-lg transition-all duration-300">
+    <div className="card dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-300">
       <figure className="relative px-4 pt-4">
         <Link
           href={`/products/${product._id}`}
@@ -26,6 +26,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
           >
             <IKImage
               path={product.imageUrl}
+              priority
               alt={product.name}
               loading="eager"
               transformation={[
@@ -68,7 +69,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
 
           <Link
             href={`/products/${product._id}`}
-            className="btn btn-primary btn-sm gap-2"
+            className="  bg-red-500 hover:shadow-md  flex px-2 py-1 rounded-md justify-center items-center gap-2 text-white"
           >
             <Eye className="w-4 h-4" />
             View Options

@@ -9,10 +9,10 @@ import {
 } from "@/models/Product";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, AlertCircle, Check, Image as ImageIcon } from "lucide-react";
-import { useNotification } from "@/app/components/Notification";
+import { Loader2, AlertCircle, Check, Image as ImageIcon } from "lucide-react"; 
 import { useSession } from "next-auth/react";
 import { apiClient } from "@/lib/api-client";
+import toast from "react-hot-toast";
 
 export default function ProductPage() {
   const params = useParams();
@@ -21,15 +21,13 @@ export default function ProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ImageVariant | null>(
     null
-  );
-  const { showNotification } = useNotification();
+  ); 
   const router = useRouter();
   const { data: session } = useSession();
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const id = params?.id;
-
+      const id = params?.id; 
       if (!id) {
         setError("Product ID is missing");
         setLoading(false);
@@ -52,13 +50,13 @@ export default function ProductPage() {
 
   const handlePurchase = async (variant: ImageVariant) => {
     if (!session) {
-      showNotification("Please login to make a purchase", "error");
+      toast.error("Please login to make a purchase");
       router.push("/login");
       return;
     }
 
     if (!product?._id) {
-      showNotification("Invalid product", "error");
+      toast.error("Invalid product");
       return;
     }
 
@@ -68,10 +66,6 @@ export default function ProductPage() {
         variant,
       });
 
-      // if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
-      //   showNotification("Razorpay key is missing", "error");
-      //   return;
-      // }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -81,7 +75,7 @@ export default function ProductPage() {
         description: `${product.name} - ${variant.type} Version`,
         order_id: orderId,
         handler: function () {
-          showNotification("Payment successful!", "success");
+          toast.success("Payment successful!");
           router.push("/orders");
         },
         prefill: {
@@ -93,10 +87,8 @@ export default function ProductPage() {
       rzp.open();
     } catch (error) {
       console.error(error);
-      showNotification(
-        error instanceof Error ? error.message : "Payment failed",
-        "error"
-      );
+      toast.error("Payment failed");
+       
     }
   };
 
@@ -115,21 +107,23 @@ export default function ProductPage() {
 
   if (loading)
     return (
-      <div className="min-h-[70vh] flex justify-center items-center">
+      <div className="min-h-[91vh] flex justify-center items-center">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
       </div>
     );
 
   if (error || !product)
     return (
-      <div className="alert alert-error max-w-md mx-auto my-8">
-        <AlertCircle className="w-6 h-6" />
-        <span>{error || "Product not found"}</span>
+      <div className="min-h-[91vh] flex justify-center items-center">
+        <span className="alert alert-error text-white max-w-md m-auto"> <AlertCircle className="w-6 h-6" />
+         {error || "Product not found"}
+         </span>
+       
       </div>
     );
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Image Section */}
         <div className="space-y-4">
@@ -167,9 +161,9 @@ export default function ProductPage() {
         </div>
 
         {/* Product Details Section */}
-        <div className="space-y-6">
+        <div className="space-y-6 ">
           <div>
-            <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
+            <h1 className="text-4xl font-bold mb-2 text-gray-800 dark:text-gray-200">{product.name}</h1>
             <p className="text-base-content/80 text-lg">
               {product.description}
             </p>
@@ -181,7 +175,7 @@ export default function ProductPage() {
             {product.variants.map((variant) => (
               <div
                 key={variant.type}
-                className={`card bg-base-200 cursor-pointer hover:bg-base-300 transition-colors ${
+                className={`card   cursor-pointer bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors ${
                   selectedVariant?.type === variant.type
                     ? "ring-2 ring-primary"
                     : ""
@@ -221,7 +215,7 @@ export default function ProductPage() {
                         ${variant.price.toFixed(2)}
                       </span>
                       <button
-                        className="btn btn-primary btn-sm"
+                        className="bg-red-500 hover:shadow-md  flex px-2 py-1 rounded-md justify-center items-center gap-2 text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           handlePurchase(variant);
@@ -237,7 +231,7 @@ export default function ProductPage() {
           </div>
 
           {/* License Information */}
-          <div className="card bg-base-200">
+          <div className="card bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700">
             <div className="card-body p-4">
               <h3 className="font-semibold mb-2">License Information</h3>
               <ul className="space-y-2">
