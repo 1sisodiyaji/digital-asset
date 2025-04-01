@@ -70,6 +70,34 @@ class ApiClient {
       body: sanitizedOrderData,
     });
   }
+
+  async updateProduct(productId: string, data: ProductFormData) {
+    const response = await fetch(`/api/products/${productId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update product");
+    }
+
+    return response.json();
+  }
+
+  async deleteProduct(productId: string) {
+    const response = await fetch(`/api/products/${productId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete product");
+    }
+
+    return response.json();
+  }
 }
 
 export const apiClient = new ApiClient();

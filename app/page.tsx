@@ -7,6 +7,9 @@ import { apiClient } from "@/lib/api-client";
 import Hero from "@/components/Hero";
 import { useSession } from "next-auth/react";
 import Process from "@/components/Process";
+import Features from "@/components/Features";
+import Pricing from "@/components/Pricing";
+import FAQ from "@/components/FAQ";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -27,18 +30,21 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      {email ?
-      <>
-        <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200">Digital Assets</h1>
-        <ImageGallery products={products} />
-      </>
-        :
+    <main>
+      {email ? (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200">Digital Assets</h1>
+          <ImageGallery products={products} />
+        </div>
+      ) : (
         <>
           <Hero />
           <Process />
+          <Features />
+          <Pricing />
+          <FAQ />
         </>
-      }
+      )}
     </main>
   );
 }

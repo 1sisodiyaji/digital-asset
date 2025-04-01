@@ -53,7 +53,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
           <h2 className="card-title text-lg">{product.name}</h2>
         </Link>
 
-        <p className="text-sm text-base-content/70 line-clamp-2 min-h-[2.5rem]">
+        <p className="text-sm text-black dark:text-base-content/70 line-clamp-2 min-h-[2.5rem]">
           {product.description}
         </p>
 
@@ -62,7 +62,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
             <span className="text-lg font-bold">
               From ${lowestPrice.toFixed(2)}
             </span>
-            <span className="text-xs text-base-content/50">
+            <span className="text-xs text-black dark:text-base-content/50">
               {product.variants.length} sizes available
             </span>
           </div>

@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import FileUpload from "./FileUpload";
 import { IKUploadResponse } from "imagekitio-next/dist/types/components/IKUpload/props";
 import { Loader2, Plus, Trash2 } from "lucide-react"; 
-import { IMAGE_VARIANTS, ImageVariantType } from "@/models/Product";
+import { IMAGE_VARIANTS, ImageVariantType, IProduct } from "@/models/Product";
 import { apiClient, ProductFormData } from "@/lib/api-client";
 import toast from "react-hot-toast";
 
-export default function AdminProductForm() {
+interface AdminProductFormProps {
+  product?: IProduct;
+  onSuccess?: () => void;
+}
+
+export default function AdminProductForm({ product, onSuccess }: AdminProductFormProps) {
   const [loading, setLoading] = useState(false); 
 
   const {
@@ -17,6 +22,7 @@ export default function AdminProductForm() {
     control,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<ProductFormData>({
     defaultValues: {
@@ -33,6 +39,15 @@ export default function AdminProductForm() {
     },
   });
 
+  useEffect(() => {
+    if (product) {
+      setValue("name", product.name);
+      setValue("description", product.description);
+      setValue("imageUrl", product.imageUrl);
+      setValue("variants", product.variants);
+    }
+  }, [product, setValue]);
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variants",
@@ -46,22 +61,17 @@ export default function AdminProductForm() {
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
     try {
-      await apiClient.createProduct(data);
-      toast.success("Product created successfully!");
-
-      // Reset form after successful submission
-      setValue("name", "");
-      setValue("description", "");
-      setValue("imageUrl", "");
-      setValue("variants", [
-        {
-          type: "SQUARE" as ImageVariantType,
-          price: 9.99,
-          license: "personal",
-        },
-      ]);
+      if (product) {
+        await apiClient.updateProduct(product._id, data);
+        toast.success("Product updated successfully!");
+      } else {
+        await apiClient.createProduct(data);
+        toast.success("Product created successfully!");
+        reset();
+      }
+      onSuccess?.();
     } catch (error) {
-      toast.error("Failed to create product");
+      toast.error(product ? "Failed to update product" : "Failed to create product");
       console.log(error);
     } finally {
       setLoading(false);
@@ -70,11 +80,11 @@ export default function AdminProductForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="form-control ">
+      <div className="form-control">
         <label className="label">Product Name</label>
         <input
           type="text"
-          className={`p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 ${errors.name ? "input-error" : ""}`}
+          className={`input input-bordered w-full ${errors.name ? "input-error" : ""}`}
           {...register("name", { required: "Name is required" })}
         />
         {errors.name && (
@@ -85,7 +95,7 @@ export default function AdminProductForm() {
       <div className="form-control">
         <label className="label">Description</label>
         <textarea
-          className={`textarea h-24 p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 ${
+          className={`textarea textarea-bordered h-24 ${
             errors.description ? "textarea-error" : ""
           }`}
           {...register("description", { required: "Description is required" })}
@@ -105,12 +115,12 @@ export default function AdminProductForm() {
       <div className="divider">Image Variants</div>
 
       {fields.map((field, index) => (
-        <div key={field.id} className="card  rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800 p-4">
+        <div key={field.id} className="card bg-base-200 p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="form-control">
               <label className="label">Size & Aspect Ratio</label>
               <select
-                className="select  select-bordered  p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-700"
+                className="select select-bordered w-full"
                 {...register(`variants.${index}.type`)}
               >
                 {Object.entries(IMAGE_VARIANTS).map(([key, value]) => (
@@ -125,7 +135,7 @@ export default function AdminProductForm() {
             <div className="form-control">
               <label className="label">License</label>
               <select
-                className="select select-bordered p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800"
+                className="select select-bordered w-full"
                 {...register(`variants.${index}.license`)}
               >
                 <option value="personal">Personal Use</option>
@@ -139,7 +149,7 @@ export default function AdminProductForm() {
                 type="number"
                 step="0.01"
                 min="0.01"
-                className="border border-gray-700 appearance-none p-2 rounded-md outline-none  dark:text-gray-200 text-gray-800 bg-gray-200 dark:bg-gray-800"
+                className="input input-bordered w-full"
                 {...register(`variants.${index}.price`, {
                   valueAsNumber: true,
                   required: "Price is required",
@@ -184,16 +194,16 @@ export default function AdminProductForm() {
 
       <button
         type="submit"
-        className="btn bg-red-500 hover:bg-red-600 text-white border-0 btn-block"
+        className="btn btn-primary btn-block"
         disabled={loading}
       >
         {loading ? (
           <>
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Creating Product...
+            {product ? "Updating Product..." : "Creating Product..."}
           </>
         ) : (
-          "Create Product"
+          product ? "Update Product" : "Create Product"
         )}
       </button>
     </form>
