@@ -6,10 +6,10 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  props: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await props.params;
+    const { id } = await params;
     await connectToDatabase();
     const product = await Product.findById(id).lean();
 
@@ -29,7 +29,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -40,11 +40,12 @@ export async function PUT(
       );
     }
 
+    const { id } = await params;
     const data = await request.json();
     await connectToDatabase();
 
     const product = await Product.findByIdAndUpdate(
-      params.id,
+      id,
       {
         name: data.name,
         description: data.description,
@@ -73,7 +74,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -84,9 +85,10 @@ export async function DELETE(
       );
     }
 
+    const { id } = await params;
     await connectToDatabase();
 
-    const product = await Product.findByIdAndDelete(params.id);
+    const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
       return NextResponse.json(

@@ -62,7 +62,7 @@ export default function AdminProductForm({ product, onSuccess }: AdminProductFor
     setLoading(true);
     try {
       if (product) {
-        await apiClient.updateProduct(product._id, data);
+        await apiClient.updateProduct(product._id?.toString() || '', data);
         toast.success("Product updated successfully!");
       } else {
         await apiClient.createProduct(data);

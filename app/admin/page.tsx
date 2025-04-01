@@ -6,6 +6,7 @@ import { apiClient } from "@/lib/api-client";
 import { Loader2, Plus, Edit2, Trash2 } from "lucide-react";
 import AdminProductForm from "@/components/AdminProductForm";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
 
 export default function AdminPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -109,13 +110,15 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <div
-            key={product._id}
+            key={product._id?.toString()}
             className="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
           >
             <figure className="relative h-48">
-              <img
+              <Image
                 src={`${process.env.NEXT_PUBLIC_URL_ENDPOINT}${product.imageUrl}`}
                 alt={product.name}
+                width={100}
+                height={100}
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 right-2 flex gap-2">
@@ -126,7 +129,7 @@ export default function AdminPage() {
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(product._id)}
+                  onClick={() => handleDelete(product._id?.toString() || '')}
                   className="btn btn-circle btn-sm bg-white dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900"
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />

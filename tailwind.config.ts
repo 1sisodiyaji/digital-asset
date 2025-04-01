@@ -1,7 +1,8 @@
 import type { Config } from "tailwindcss";
 import daisyui from "daisyui";
 import tailwindcssAnimate from "tailwindcss-animate";
-import  flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
+// @ts-expect-error - No type definitions available for this module
+import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 
 
 export default {
